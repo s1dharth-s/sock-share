@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>SockShare</title>
+  </head>
+  <div class="container">
+    <script src="https://unpkg.com/htmx.org@1.7.0" integrity="sha384-EzBXYPt0/T6gxNp0nuPtLkmRpmDBbjg6WmCUZRLXBBwYYmwAUxzlSGej0ARHX0Bo" crossorigin="anonymous"></script>
+    <h1>SockShare</h1>
+
+    <div hx-ws="connect:/chatroom">
+    <div id="idMessage">
+      </div>
+      <form autocomplete="off" hx-ws="send">
+          <input autocomplete="off" name="chat_message">
+          <button type="submit"><img class="htmx-indicator" src="/spinner.gif">Submit</button>
+      </form>
+    </div>
+  </div>
+</html>
