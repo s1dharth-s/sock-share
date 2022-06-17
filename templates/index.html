@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      />
+      <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+      <title>SockShare</title>
+      <script src="https://unpkg.com/htmx.org@1.7.0" integrity="sha384-EzBXYPt0/T6gxNp0nuPtLkmRpmDBbjg6WmCUZRLXBBwYYmwAUxzlSGej0ARHX0Bo" crossorigin="anonymous"></script>
+      <script src="https://unpkg.com/htmx.org@1.7.0/dist/ext/ws.js"></script>
+    </head>
+    <div class="container">
+      <h1>SockShare</h1>
+      
+      <div hx-ws="connect:/create">
+        <!-- input for new messages, send a message to the backend
+        via websocket -->
+        <form autocomplete="off" hx-ws="send:submit">
+          <input name="chat_message" />
+        </form>
+      </div>
+      <div id="content"></div>
+    </div>
+</html>
