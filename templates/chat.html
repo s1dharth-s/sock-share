@@ -1,0 +1,9 @@
+<div class="row justify-content-center" hx-ws="connect:/connect?roomno={{.RoomNo}}" hx-trigger="load">
+    <!-- input for new messages, send a message to the backend
+    via websocket -->
+  <form autocomplete="off" hx-ws="send:submit">
+    <input rid={{.RoomNo}} name="chat_message" />
+  </form>
+</div>
+
+<div id="content"></div>

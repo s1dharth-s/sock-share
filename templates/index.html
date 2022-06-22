@@ -12,16 +12,31 @@
       <script src="https://unpkg.com/htmx.org@1.7.0" integrity="sha384-EzBXYPt0/T6gxNp0nuPtLkmRpmDBbjg6WmCUZRLXBBwYYmwAUxzlSGej0ARHX0Bo" crossorigin="anonymous"></script>
       <script src="https://unpkg.com/htmx.org@1.7.0/dist/ext/ws.js"></script>
     </head>
-    <div class="container">
-      <h1>SockShare</h1>
-      
-      <div hx-ws="connect:/create">
-        <!-- input for new messages, send a message to the backend
-        via websocket -->
-        <form autocomplete="off" hx-ws="send:submit">
-          <input name="chat_message" />
-        </form>
+      <div class="jumbotron">
+        <h1>SockShare</h1>
+        <p>Easily Share links</p>
       </div>
-      <div id="content"></div>
-    </div>
+
+      <div class="container">
+        <div id="buttons">
+          <div class="row justify-content-center">
+            <button type="button" hx-get="/create" hx-target="#buttons" class="btn btn-outline-info btn-lg">Create Room</button>
+            <br>
+          </div>
+          <div>
+            <br>
+            <p class="font-weight-bold text-center"> OR </p>
+          </div>
+          <form hx-get="/create" hx-target="#buttons">
+            <div class="row justify-content-center">
+              <input name="roomcode" id="roomcode" type="text" placeholder="Enter Room Code">
+              <span class="input-group-btn">
+                <button type="submit" class="btn btn-dark">Join Room</button>
+              </span>
+            </div>
+          </form>
+    
+        </div>
+      </div>
+      
 </html>
