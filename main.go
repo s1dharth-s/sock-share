@@ -3,15 +3,23 @@ package main
 import (
 	"net/http"
 
-	"github.com/s1dharth-s/sock-share/sockshare"
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	h := sockshare.NewHub()
-	http.HandleFunc("/create", func(w http.ResponseWriter, r *http.Request) {
-		sockshare.HandleSocket(h, w, r)
+	var hub = newHub()
+	r := gin.Default()
+
+	r.LoadHTMLGlob("templates/*.html")
+
+	r.GET("/", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "index.html", nil)
 	})
-	go h.Run()
-	http.Handle("/", http.FileServer(http.Dir("./")))
-	http.ListenAndServe("localhost:8000", nil)
+
+	r.GET("/create", func(c *gin.Context) {
+		createRoomID(hub, c)
+	})
+	r.GET("/connect", connectRoom)
+	go hub.Run()
+	r.Run()
 }
