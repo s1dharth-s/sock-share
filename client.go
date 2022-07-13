@@ -21,17 +21,21 @@ type Room struct {
 	roomID     string
 	cons       map[int]*websocket.Conn
 	msgChannel chan *Message
+	msg        *Message
 }
 
 type Message struct {
+	// mu   sync.Mutex
 	Chat string `json:"chat_message"`
 	rid  string
 	cid  string
 }
 
+// var msg = &Message{}
+
 var Rooms = make(map[string]*Room)
 
-func createRoomID(hub *Hub, c *gin.Context) {
+func createRoomID(c *gin.Context) {
 	roomNo, ok := c.GetQuery("roomcode")
 
 	if !ok {
@@ -43,12 +47,13 @@ func createRoomID(hub *Hub, c *gin.Context) {
 			roomID:     roomNo,
 			cons:       make(map[int]*websocket.Conn),
 			msgChannel: make(chan *Message),
+			msg:        &Message{},
 		}
 
 		room := Rooms[roomNo]
-		hub.register <- room
-		go room.handleReads(hub)
-		go room.handleWrites(hub)
+		// hub.register <- room
+		// go room.handleReads(hub)
+		go room.handleWrites()
 
 		log.Println("New room created with roomID: ", roomNo)
 	} else {
@@ -63,6 +68,8 @@ func connectRoom(c *gin.Context) {
 	roomNo, ok := c.GetQuery("roomno")
 	if ok {
 		log.Println("Making new connection for ", roomNo)
+	} else {
+		panic("Could not find room number!")
 	}
 	r := Rooms[roomNo]
 	ws, err := upgrader.Upgrade(c.Writer, c.Request, nil)
@@ -71,50 +78,38 @@ func connectRoom(c *gin.Context) {
 	}
 	r.cons[r.count] = ws
 	log.Println("Client connected: ", r.count)
-	// go handleReads(r, hub)
-	// go handleWrites(r, hub)
-}
-
-func (r *Room) handleReads(hub *Hub) {
-	defer func() {
-		hub.unregister <- r
-		for _, con := range r.cons {
-			con.Close()
-		}
-	}()
-
-	msg := &Message{}
 
 	for {
-		for cid, conn := range r.cons {
-			err := conn.ReadJSON(msg)
-			if err != nil {
-				log.Println(err)
-				break
-			}
-			msg.cid = strconv.Itoa(cid)
-			msg.rid = r.roomID
-			log.Println("Message: ", msg.rid, " ", msg.Chat, " ", msg.cid)
-			hub.message <- msg
+		err := ws.ReadJSON(r.msg)
+		if err != nil {
+			log.Println(err)
+			break
 		}
+		r.msg.cid = strconv.Itoa(r.count)
+		r.msg.rid = r.roomID
+		log.Println("Message: ", r.msg.rid, " ", r.msg.Chat, " ", r.msg.cid)
+		// hub.message <- r.msg
+		r.msgChannel <- r.msg
 	}
 }
 
-func (r *Room) handleWrites(hub *Hub) {
+func (r *Room) handleWrites() {
 	for {
 		msg := <-r.msgChannel
-
 		if msg == nil {
+			log.Println("nil message")
 			continue
 		}
+		log.Println("Received message: ", msg.Chat)
 
 		sendMsg := `<div hx-swap-oob="beforeend:#content">` + msg.Chat + `<br></div>`
 
 		for _, conn := range r.cons {
 			if err := conn.WriteMessage(websocket.TextMessage, []byte(sendMsg)); err != nil {
 				log.Print("ERROR: ", err)
-				return
+				// return
 			}
+			log.Println("Sent message!")
 		}
 	}
 }

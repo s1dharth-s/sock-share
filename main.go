@@ -7,7 +7,6 @@ import (
 )
 
 func main() {
-	var hub = newHub()
 	r := gin.Default()
 
 	r.LoadHTMLGlob("templates/*.html")
@@ -16,10 +15,7 @@ func main() {
 		c.HTML(http.StatusOK, "index.html", nil)
 	})
 
-	r.GET("/create", func(c *gin.Context) {
-		createRoomID(hub, c)
-	})
+	r.GET("/create", createRoomID)
 	r.GET("/connect", connectRoom)
-	go hub.Run()
 	r.Run()
 }
